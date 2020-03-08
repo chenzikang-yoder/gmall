@@ -3,8 +3,10 @@ package com.atguigu.gmall.mange.service.Impl;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.atguigu.gmall.bean.PmsBaseAttrInfo;
 import com.atguigu.gmall.bean.PmsBaseAttrValue;
+import com.atguigu.gmall.bean.PmsBaseSaleAttr;
 import com.atguigu.gmall.mange.mapper.PmsBaseAttrInfoMapper;
 import com.atguigu.gmall.mange.mapper.PmsBaseAttrValueMapper;
+import com.atguigu.gmall.mange.mapper.PmsBaseSaleAttrMapper;
 import com.atguigu.gmall.service.AttrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import tk.mybatis.mapper.entity.Example;
@@ -16,6 +18,8 @@ public class AttrServiceImpl implements AttrService {
     PmsBaseAttrInfoMapper pmsBaseAttrInfoMapper;
     @Autowired
     PmsBaseAttrValueMapper pmsBaseAttrValueMapper;
+    @Autowired
+    PmsBaseSaleAttrMapper pmsBaseSaleAttrMapper;
     @Override
     public List<PmsBaseAttrInfo> attrInfoList(String catalog3Id) {
         PmsBaseAttrInfo pmsBaseAttrInfo=new PmsBaseAttrInfo();
@@ -40,13 +44,13 @@ public class AttrServiceImpl implements AttrService {
             e.createCriteria().andEqualTo("id",pmsBaseAttrInfo.getId());
             pmsBaseAttrInfoMapper.updateByExampleSelective(pmsBaseAttrInfo,e);
 
-
             PmsBaseAttrValue pmsBaseAttrValueDel=new PmsBaseAttrValue();
             pmsBaseAttrValueDel.setAttrId(pmsBaseAttrInfo.getId());
             pmsBaseAttrValueMapper.delete(pmsBaseAttrValueDel);
 
             List<PmsBaseAttrValue> attrValueList = pmsBaseAttrInfo.getAttrValueList();
             for (PmsBaseAttrValue pmsBaseAttrValue : attrValueList) {
+                pmsBaseAttrValue.setAttrId(pmsBaseAttrInfo.getId());
                 pmsBaseAttrValueMapper.insertSelective(pmsBaseAttrValue);
             }
         }else {
@@ -58,6 +62,11 @@ public class AttrServiceImpl implements AttrService {
             }
         }
         return "success";
+    }
+
+    @Override
+    public List<PmsBaseSaleAttr> baseSaleAttrList() {
+        return pmsBaseSaleAttrMapper.selectAll();
     }
 
 }
