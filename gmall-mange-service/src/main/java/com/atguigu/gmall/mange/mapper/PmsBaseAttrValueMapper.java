@@ -1,5 +1,6 @@
 package com.atguigu.gmall.mange.mapper;
 
+import com.atguigu.gmall.bean.PmsBaseAttrInfo;
 import com.atguigu.gmall.bean.PmsBaseAttrValue;
 import tk.mybatis.mapper.common.Mapper;
 
