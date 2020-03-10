@@ -13,6 +13,7 @@ import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
 import java.util.List;
+
 @Service
 public class AttrServiceImpl implements AttrService {
     @Autowired
@@ -21,9 +22,10 @@ public class AttrServiceImpl implements AttrService {
     PmsBaseAttrValueMapper pmsBaseAttrValueMapper;
     @Autowired
     PmsBaseSaleAttrMapper pmsBaseSaleAttrMapper;
+
     @Override
     public List<PmsBaseAttrInfo> attrInfoList(String catalog3Id) {
-        PmsBaseAttrInfo pmsBaseAttrInfo=new PmsBaseAttrInfo();
+        PmsBaseAttrInfo pmsBaseAttrInfo = new PmsBaseAttrInfo();
         pmsBaseAttrInfo.setCatalog3Id(catalog3Id);
         List<PmsBaseAttrInfo> pmsBaseAttrInfos = pmsBaseAttrInfoMapper.select(pmsBaseAttrInfo);
         for (PmsBaseAttrInfo baseAttrInfo : pmsBaseAttrInfos) {
@@ -39,7 +41,7 @@ public class AttrServiceImpl implements AttrService {
 
     @Override
     public List<PmsBaseAttrValue> getAttrValueList(String attrId) {
-        PmsBaseAttrValue pmsBaseAttrValue=new PmsBaseAttrValue();
+        PmsBaseAttrValue pmsBaseAttrValue = new PmsBaseAttrValue();
         pmsBaseAttrValue.setAttrId(attrId);
         List<PmsBaseAttrValue> pmsBaseAttrValues = pmsBaseAttrValueMapper.select(pmsBaseAttrValue);
         return pmsBaseAttrValues;
@@ -48,12 +50,12 @@ public class AttrServiceImpl implements AttrService {
     @Override
     public String saveAttrInfo(PmsBaseAttrInfo pmsBaseAttrInfo) {
         String id = pmsBaseAttrInfo.getId();
-        if (id != null){
-            Example e=new Example(PmsBaseAttrInfo.class);
-            e.createCriteria().andEqualTo("id",pmsBaseAttrInfo.getId());
-            pmsBaseAttrInfoMapper.updateByExampleSelective(pmsBaseAttrInfo,e);
+        if (id != null) {
+            Example e = new Example(PmsBaseAttrInfo.class);
+            e.createCriteria().andEqualTo("id", pmsBaseAttrInfo.getId());
+            pmsBaseAttrInfoMapper.updateByExampleSelective(pmsBaseAttrInfo, e);
 
-            PmsBaseAttrValue pmsBaseAttrValueDel=new PmsBaseAttrValue();
+            PmsBaseAttrValue pmsBaseAttrValueDel = new PmsBaseAttrValue();
             pmsBaseAttrValueDel.setAttrId(pmsBaseAttrInfo.getId());
             pmsBaseAttrValueMapper.delete(pmsBaseAttrValueDel);
 
@@ -62,7 +64,7 @@ public class AttrServiceImpl implements AttrService {
                 pmsBaseAttrValue.setAttrId(pmsBaseAttrInfo.getId());
                 pmsBaseAttrValueMapper.insertSelective(pmsBaseAttrValue);
             }
-        }else {
+        } else {
             pmsBaseAttrInfoMapper.insertSelective(pmsBaseAttrInfo);
             List<PmsBaseAttrValue> attrValueList = pmsBaseAttrInfo.getAttrValueList();
             for (PmsBaseAttrValue pmsBaseAttrValue : attrValueList) {

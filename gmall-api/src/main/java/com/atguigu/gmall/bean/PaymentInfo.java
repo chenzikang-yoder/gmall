@@ -13,7 +13,7 @@ public class PaymentInfo {
 
     @Column
     @Id
-    private String  id;
+    private String id;
 
     @Column
     private String outTradeNo;

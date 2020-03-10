@@ -21,31 +21,35 @@ public class SpuController {
 
     @RequestMapping("fileUpload")
     @ResponseBody
-    public String fileUpload(@RequestParam("file") MultipartFile multipartFile){
-        String imgUrl= PmsUploadUtil.uploadImage(multipartFile);
+    public String fileUpload(@RequestParam("file") MultipartFile multipartFile) {
+        String imgUrl = PmsUploadUtil.uploadImage(multipartFile);
         return imgUrl;
     }
+
     @RequestMapping("saveSpuInfo")
     @ResponseBody
-    public String saveSpuInfo(@RequestBody PmsProductInfo pmsProductInfo){
+    public String saveSpuInfo(@RequestBody PmsProductInfo pmsProductInfo) {
         spuService.saveSpuInfo(pmsProductInfo);
         return "success";
     }
+
     @RequestMapping("spuImageList")
     @ResponseBody
-    public List<PmsProductImage> spuImageList(String spuId){
+    public List<PmsProductImage> spuImageList(String spuId) {
         List<PmsProductImage> pmsProductImages = spuService.spuImageList(spuId);
         return pmsProductImages;
     }
+
     @RequestMapping("spuSaleAttrList")
     @ResponseBody
-    public List<PmsProductSaleAttr> spuSaleAttrList(String spuId){
+    public List<PmsProductSaleAttr> spuSaleAttrList(String spuId) {
         List<PmsProductSaleAttr> pmsProductSaleAttrs = spuService.spuSaleAttrList(spuId);
         return pmsProductSaleAttrs;
     }
+
     @RequestMapping("spuList")
     @ResponseBody
-    public List<PmsProductInfo> spuList(String catalog3Id){
+    public List<PmsProductInfo> spuList(String catalog3Id) {
         List<PmsProductInfo> pmsProductInfos = spuService.spuList(catalog3Id);
         return pmsProductInfos;
     }

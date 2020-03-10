@@ -23,9 +23,9 @@ public class GmallMangeWebApplicationTests {
         TrackerServer trackerServer = trackerClient.getTrackerServer();
         StorageClient storageClient = new StorageClient(trackerServer, null);
         String[] uploadInfos = storageClient.upload_file("d:/a.jpg", "jpg", null);
-        String url="http://192.168.3.117";
+        String url = "http://192.168.3.117";
         for (String uploadInfo : uploadInfos) {
-            url+="/"+uploadInfo;
+            url += "/" + uploadInfo;
         }
         System.out.println(url);
     }

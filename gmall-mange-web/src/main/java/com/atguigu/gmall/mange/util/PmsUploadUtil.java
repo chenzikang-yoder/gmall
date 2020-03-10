@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class PmsUploadUtil {
     public static String uploadImage(MultipartFile multipartFile) {
-        String imgUrl="http://192.168.3.117";
+        String imgUrl = "http://192.168.3.117";
         String tracker = PmsUploadUtil.class.getResource("/tracker.conf").getPath();
         try {
             ClientGlobal.init(tracker);
@@ -30,15 +30,15 @@ public class PmsUploadUtil {
             byte[] bytes = multipartFile.getBytes();
             String originalFilename = multipartFile.getOriginalFilename();
             int i = originalFilename.lastIndexOf(".");
-            String extName = originalFilename.substring(i+1);
-            String[]  uploadInfos = storageClient.upload_file(bytes, extName, null);
+            String extName = originalFilename.substring(i + 1);
+            String[] uploadInfos = storageClient.upload_file(bytes, extName, null);
             for (String uploadInfo : uploadInfos) {
-                imgUrl+="/"+uploadInfo;
+                imgUrl += "/" + uploadInfo;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         return imgUrl;
     }
 }
