@@ -18,7 +18,7 @@ public class UserController {
 
     @RequestMapping("getReceiveAddressByMemberId")
     @ResponseBody
-    public List<UmsMemberReceiveAddress> getReceiveAddressByMemberId(String memberId){
+    public List<UmsMemberReceiveAddress> getReceiveAddressByMemberId(String memberId) {
         List<UmsMemberReceiveAddress> umsMemberReceiveAddresses = userService.getReceiveAddressByMemberId(memberId);
 
         return umsMemberReceiveAddresses;
@@ -27,7 +27,7 @@ public class UserController {
 
     @RequestMapping("getAllUser")
     @ResponseBody
-    public List<UmsMember> getAllUser(){
+    public List<UmsMember> getAllUser() {
 
         List<UmsMember> umsMembers = userService.getAllUser();
         return umsMembers;
@@ -35,10 +35,9 @@ public class UserController {
 
     @RequestMapping("index")
     @ResponseBody
-    public String index(){
+    public String index() {
         return "hello user";
     }
-
 
 
 }

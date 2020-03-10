@@ -18,28 +18,32 @@ import java.util.List;
 public class AttrController {
     @Reference
     AttrService attrService;
+
     @RequestMapping("attrInfoList")
     @ResponseBody
-    public List<PmsBaseAttrInfo> attrInfoList(String catalog3Id){
-        List<PmsBaseAttrInfo> pmsBaseAttrInfos=attrService.attrInfoList(catalog3Id);
+    public List<PmsBaseAttrInfo> attrInfoList(String catalog3Id) {
+        List<PmsBaseAttrInfo> pmsBaseAttrInfos = attrService.attrInfoList(catalog3Id);
         return pmsBaseAttrInfos;
     }
+
     @RequestMapping("baseSaleAttrList")
     @ResponseBody
-    public List<PmsBaseSaleAttr> baseSaleAttrList(){
-        List<PmsBaseSaleAttr> pmsBaseSaleAttrs=attrService.baseSaleAttrList();
+    public List<PmsBaseSaleAttr> baseSaleAttrList() {
+        List<PmsBaseSaleAttr> pmsBaseSaleAttrs = attrService.baseSaleAttrList();
         return pmsBaseSaleAttrs;
     }
+
     @RequestMapping("getAttrValueList")
     @ResponseBody
-    public List<PmsBaseAttrValue> getAttrValueList(String attrId){
-        List<PmsBaseAttrValue> pmsBaseAttrInfos=attrService.getAttrValueList(attrId);
+    public List<PmsBaseAttrValue> getAttrValueList(String attrId) {
+        List<PmsBaseAttrValue> pmsBaseAttrInfos = attrService.getAttrValueList(attrId);
         return pmsBaseAttrInfos;
     }
+
     @RequestMapping("saveAttrInfo")
     @ResponseBody
-    public String saveAttrInfo(@RequestBody PmsBaseAttrInfo pmsBaseAttrInfo){
-        String success=attrService.saveAttrInfo(pmsBaseAttrInfo);
+    public String saveAttrInfo(@RequestBody PmsBaseAttrInfo pmsBaseAttrInfo) {
+        String success = attrService.saveAttrInfo(pmsBaseAttrInfo);
         return success;
     }
 }
