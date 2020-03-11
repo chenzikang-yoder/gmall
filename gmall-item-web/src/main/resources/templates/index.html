@@ -13,5 +13,12 @@
     </p>
     <p th:if="1==1">我是存在的</p>
     <input type="checkbox" th:checked="(${check}=='0')?true:false" />
+    <a th:href="'javascript:a(\''+${hello}+'\')'">a</a>
+    <div th:include="indexInner::i">被引入</div>
+<script>
+    function a(hello) {
+        alert("ok"+hello);
+    }
+</script>
 </body>
 </html>
