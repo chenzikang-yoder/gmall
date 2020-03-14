@@ -1,6 +1,7 @@
 package com.atguigu.gmall.mange.service.Impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.bean.PmsSkuAttrValue;
 import com.atguigu.gmall.bean.PmsSkuImage;
 import com.atguigu.gmall.bean.PmsSkuInfo;
@@ -10,9 +11,14 @@ import com.atguigu.gmall.mange.mapper.PmsSkuSaleAttrValueMapper;
 import com.atguigu.gmall.mange.mapper.PmsSkuAttrValueMapper;
 import com.atguigu.gmall.mange.mapper.PmsskuInfoMapper;
 import com.atguigu.gmall.service.SkuService;
+import com.atguigu.gmall.util.RedisUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import redis.clients.jedis.Jedis;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class SkuServiceImpl implements SkuService {
@@ -28,6 +34,9 @@ public class SkuServiceImpl implements SkuService {
 
     @Autowired
     PmsSkuImageMapper pmsSkuImageMapper;
+
+    @Autowired
+    RedisUtil redisUtil;
 
 
     @Override
@@ -62,15 +71,65 @@ public class SkuServiceImpl implements SkuService {
     }
 
     @Override
-    public PmsSkuInfo getSkuById(String skuId) {
+    public PmsSkuInfo getSkuById(String skuId, String ip) {
+        System.out.println("ip为" + ip + Thread.currentThread().getName());
+        PmsSkuInfo pmsSkuInfo = new PmsSkuInfo();
+        Jedis jedis = redisUtil.getJedis();
+        String skuKey = "sku:" + skuId + ":info";
+        String skuJson = jedis.get(skuKey);
+        if (StringUtils.isNotBlank(skuJson)) {
+            System.out.println("ip为" + ip + Thread.currentThread().getName() + "从缓存");
+            pmsSkuInfo = JSON.parseObject(skuJson, PmsSkuInfo.class);
+        } else {
+            System.out.println("ip为" + ip + Thread.currentThread().getName() + "缓存没有申请锁");
+            String token = UUID.randomUUID().toString();
+            String OK = jedis.set("sku:" + skuId + ":lock", token, "nx", "px", 10 * 1000);
+            if (StringUtils.isNotBlank(OK) && OK.equals("OK")) {
+                System.out.println("ip为" + ip + Thread.currentThread().getName() + "有权10秒");
+                pmsSkuInfo = getSkuByIdFromDB(skuId);
+                if (pmsSkuInfo != null) {
+                    jedis.set(skuKey, JSON.toJSONString(pmsSkuInfo));
+                } else {
+                    jedis.setex(skuKey, 60 * 3, JSON.toJSONString(""));
+                }
+                System.out.println("ip为" + ip + Thread.currentThread().getName() + "使用完毕");
+                String lockToken = jedis.get("sku:" + skuId + ":lock");
+                if (StringUtils.isNotBlank(lockToken) && lockToken.equals(token)) {
+                    jedis.del("sku:" + skuId + ":lock");
+                }
+            } else {
+                System.out.println("ip为" + ip + Thread.currentThread().getName() + "自旋");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return getSkuById(skuId, ip);
+            }
+
+        }
+
+        jedis.close();
+        return pmsSkuInfo;
+    }
+
+    public PmsSkuInfo getSkuByIdFromDB(String skuId) {
         PmsSkuInfo pmsSkuInfo = new PmsSkuInfo();
         pmsSkuInfo.setId(skuId);
-        PmsSkuInfo SkuInfo= pmsSkuInfoMapper.selectOne(pmsSkuInfo);
+        PmsSkuInfo SkuInfo = pmsSkuInfoMapper.selectOne(pmsSkuInfo);
 
         PmsSkuImage pmsSkuImage = new PmsSkuImage();
         pmsSkuImage.setSkuId(skuId);
         List<PmsSkuImage> pmsSkuImages = pmsSkuImageMapper.select(pmsSkuImage);
-        SkuInfo.setSkuImageList(pmsSkuImages);
+        if (SkuInfo != null) {
+            SkuInfo.setSkuImageList(pmsSkuImages);
+        }
         return SkuInfo;
+    }
+
+    @Override
+    public List<PmsSkuInfo> getSkuSaleAttrValueListBySpu(String productId) {
+        List<PmsSkuInfo> pmsSkuInfos = pmsSkuInfoMapper.selectSkuSaleAttrValueListBySpu(productId);
+        return pmsSkuInfos;
     }
 }
