@@ -9,3 +9,6 @@ gmall-mange-web服务的web层8081
 
 #gmall-item-service前台的商品详细服务8072
 gmall-item-web前台的商品详细展示8082
+
+gmall-search-web搜索服务的前台 8083
+gmall-search -service搜索服务的后台 8074

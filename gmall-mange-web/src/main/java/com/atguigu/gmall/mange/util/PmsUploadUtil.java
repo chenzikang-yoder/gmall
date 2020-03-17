@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class PmsUploadUtil {
     public static String uploadImage(MultipartFile multipartFile) {
-        String imgUrl = "http://192.168.3.117";
+        String imgUrl = "http://192.168.220.117";
         String tracker = PmsUploadUtil.class.getResource("/tracker.conf").getPath();
         try {
             ClientGlobal.init(tracker);
