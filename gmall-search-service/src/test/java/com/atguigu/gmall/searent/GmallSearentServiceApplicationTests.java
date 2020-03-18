@@ -9,6 +9,11 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.Index;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeanUtils;
@@ -31,37 +36,32 @@ public class GmallSearentServiceApplicationTests {
 
     @Test
     public void contextLoads() throws IOException {
+        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+        SearchSourceBuilder searchSourceBuilder=new SearchSourceBuilder();
+
+
+        TermsQueryBuilder termQueryBuilder=new TermsQueryBuilder("skuAttrValueList.valueId", new String[]{"39", "40", "41"});
+        boolQueryBuilder.filter(termQueryBuilder);
+
+        MatchQueryBuilder matchQueryBuilder=new MatchQueryBuilder("skuName","华为");
+        boolQueryBuilder.must(matchQueryBuilder);
+
+        searchSourceBuilder.query(boolQueryBuilder);
+
+        searchSourceBuilder.from(0);
+        searchSourceBuilder.size(20);
+
+        String dslStr=searchSourceBuilder.toString();
+        System.out.println(dslStr);
         List<PmsSearchSkuInfo> pmsSearchSkuInfos = new ArrayList<>();
-        Search search = new Search.Builder("{\n" +
-                "  \"query\": {\n" +
-                "    \"bool\": {\n" +
-                "      \"filter\": [\n" +
-                "        {\n" +
-                "          \"terms\": {\n" +
-                "            \"skuAttrValueList.valueId\": [\n" +
-                "              \"39\",\n" +
-                "              \"40\",\n" +
-                "              \"41\"\n" +
-                "            ]\n" +
-                "          }\n" +
-                "        }\n" +
-                "      ],\n" +
-                "      \"must\": [\n" +
-                "        {\n" +
-                "          \"match\": {\n" +
-                "            \"skuName\": \"华为\"\n" +
-                "          }\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    }\n" +
-                "  }\n" +
-                "}").addIndex("gmall").addType("PmsSkuInfo").build();
+        Search search = new Search.Builder(dslStr).addIndex("gmall").addType("PmsSkuInfo").build();
         SearchResult execute = jestClient.execute(search);
         List<SearchResult.Hit<PmsSearchSkuInfo, Void>> hits = execute.getHits(PmsSearchSkuInfo.class);
         for (SearchResult.Hit<PmsSearchSkuInfo, Void> hit : hits) {
             PmsSearchSkuInfo source = hit.source;
             pmsSearchSkuInfos.add(source);
         }
+        System.out.println(pmsSearchSkuInfos.size());
     }
 
     @Test
@@ -71,10 +71,11 @@ public class GmallSearentServiceApplicationTests {
         for (PmsSkuInfo pmsSkuInfo : pmsSkuInfoList) {
             PmsSearchSkuInfo pmsSearchSkuInfo = new PmsSearchSkuInfo();
             BeanUtils.copyProperties(pmsSkuInfo, pmsSearchSkuInfo);
+            pmsSearchSkuInfo.setId(Long.parseLong(pmsSkuInfo.getId()));
             pmsSearchSkuInfoList.add(pmsSearchSkuInfo);
         }
         for (PmsSearchSkuInfo pmsSearchSkuInfo : pmsSearchSkuInfoList) {
-            Index put = new Index.Builder(pmsSearchSkuInfo).index("gmall").type("PmsSkuInfo").id(pmsSearchSkuInfo.getId()).build();
+            Index put = new Index.Builder(pmsSearchSkuInfo).index("gmall").type("PmsSkuInfo").id(pmsSearchSkuInfo.getId()+"").build();
             jestClient.execute(put);
         }
     }
