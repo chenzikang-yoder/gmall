@@ -13,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -53,7 +55,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     private String getSearchDsl(PmsSearchParam pmsSearchParam) {
-        List<PmsSkuAttrValue> pmsSearchSkuInfoList = pmsSearchParam.getSkuAttrValueList();
+        String[] valueId = pmsSearchParam.getValueId();
         String keyword = pmsSearchParam.getKeyword();
         String catalog3Id = pmsSearchParam.getCatalog3Id();
 
@@ -63,9 +65,9 @@ public class SearchServiceImpl implements SearchService {
             TermQueryBuilder termQueryBuilder = new TermQueryBuilder("catalog3Id", catalog3Id);
             boolQueryBuilder.filter(termQueryBuilder);
         }
-        if (pmsSearchSkuInfoList != null) {
-            for (PmsSkuAttrValue pmsSkuAttrValue : pmsSearchSkuInfoList) {
-                TermQueryBuilder termQueryBuilder = new TermQueryBuilder("skuAttrValueList.valueId", pmsSkuAttrValue.getValueId());
+        if (valueId != null) {
+            for (String pmsSkuAttrValue : valueId) {
+                TermQueryBuilder termQueryBuilder = new TermQueryBuilder("skuAttrValueList.valueId", pmsSkuAttrValue);
                 boolQueryBuilder.filter(termQueryBuilder);
             }
         }
@@ -86,6 +88,9 @@ public class SearchServiceImpl implements SearchService {
         searchSourceBuilder.sort("id", SortOrder.DESC);
         searchSourceBuilder.from(0);
         searchSourceBuilder.size(20);
+
+        TermsBuilder groupby_attr = AggregationBuilders.terms("groupby_attr").field("skuAttrValueList.valueId");
+        searchSourceBuilder.aggregation(groupby_attr);
         return searchSourceBuilder.toString();
     }
 }
