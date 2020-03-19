@@ -16,7 +16,7 @@ public class PmsSearchSkuInfo implements Serializable {
     private String skuDefaultImg;
     private double hotScore;
     private String productId;
-    private List<PmsSkuInfo> skuAttrValueList;
+    private List<PmsSkuAttrValue> skuAttrValueList;
 
     public long getId() {
         return id;
@@ -82,11 +82,11 @@ public class PmsSearchSkuInfo implements Serializable {
         this.productId = productId;
     }
 
-    public List<PmsSkuInfo> getSkuAttrValueList() {
+    public List<PmsSkuAttrValue> getSkuAttrValueList() {
         return skuAttrValueList;
     }
 
-    public void setSkuAttrValueList(List<PmsSkuInfo> skuAttrValueList) {
+    public void setSkuAttrValueList(List<PmsSkuAttrValue> skuAttrValueList) {
         this.skuAttrValueList = skuAttrValueList;
     }
 }

@@ -8,10 +8,12 @@ import com.atguigu.gmall.mange.mapper.PmsBaseAttrInfoMapper;
 import com.atguigu.gmall.mange.mapper.PmsBaseAttrValueMapper;
 import com.atguigu.gmall.mange.mapper.PmsBaseSaleAttrMapper;
 import com.atguigu.gmall.service.AttrService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -78,6 +80,13 @@ public class AttrServiceImpl implements AttrService {
     @Override
     public List<PmsBaseSaleAttr> baseSaleAttrList() {
         return pmsBaseSaleAttrMapper.selectAll();
+    }
+
+    @Override
+    public List<PmsBaseAttrInfo> getAttrValueListByValueId(HashSet<String> valueSet) {
+        String valueSetStr = StringUtils.join(valueSet, ",");
+        List<PmsBaseAttrInfo> pmsBaseAttrInfos=pmsBaseAttrInfoMapper.selectAttrValueListByBalueId(valueSetStr);
+        return pmsBaseAttrInfos;
     }
 
 }
