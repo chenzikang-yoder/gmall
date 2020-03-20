@@ -85,7 +85,7 @@ public class SearchServiceImpl implements SearchService {
 
         searchSourceBuilder.query(boolQueryBuilder);
 
-        searchSourceBuilder.sort("id", SortOrder.DESC);
+        searchSourceBuilder.sort("_score", SortOrder.DESC);
         searchSourceBuilder.from(0);
         searchSourceBuilder.size(20);
 

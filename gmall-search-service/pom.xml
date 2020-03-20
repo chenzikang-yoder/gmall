@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.atguigu.gmall</groupId>
-    <artifactId>gmall-searent-service</artifactId>
+    <artifactId>gmall-search-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>gmall-searent-service</name>
     <description>Demo project for Spring Boot</description>

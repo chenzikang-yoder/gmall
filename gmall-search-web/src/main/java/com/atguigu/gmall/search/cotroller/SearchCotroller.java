@@ -38,33 +38,40 @@ public class SearchCotroller {
         List<PmsBaseAttrInfo> pmsBaseAttrInfos = attrService.getAttrValueListByValueId(valueSet);
         map.put("attrList", pmsBaseAttrInfos);
         String[] delvalueIds = pmsSearchParam.getValueId();
+        List<PmsSeachCrumb> pmsSeachCrumbs = new ArrayList<>();
         if (delvalueIds != null) {
-            Iterator<PmsBaseAttrInfo> iterator = pmsBaseAttrInfos.iterator();
-            while (iterator.hasNext()) {
-                PmsBaseAttrInfo pmsBaseAttrInfo = iterator.next();
-                List<PmsBaseAttrValue> attrValueList = pmsBaseAttrInfo.getAttrValueList();
-                for (PmsBaseAttrValue pmsBaseAttrValue : attrValueList) {
-                    String ValueId = pmsBaseAttrValue.getId();
-                    for (String delvalueId : delvalueIds) {
+            for (String delvalueId : delvalueIds) {
+                Iterator<PmsBaseAttrInfo> iterator = pmsBaseAttrInfos.iterator();
+                PmsSeachCrumb pmsSeachCrumb = new PmsSeachCrumb();
+                pmsSeachCrumb.setValueId(delvalueId);
+                pmsSeachCrumb.setUrlParam(getUrlParam(pmsSearchParam, delvalueId));
+                while (iterator.hasNext()) {
+                    PmsBaseAttrInfo pmsBaseAttrInfo = iterator.next();
+                    List<PmsBaseAttrValue> attrValueList = pmsBaseAttrInfo.getAttrValueList();
+                    for (PmsBaseAttrValue pmsBaseAttrValue : attrValueList) {
+                        String ValueId = pmsBaseAttrValue.getId();
                         if (delvalueId.equals(ValueId)) {
+                            pmsSeachCrumb.setValueName(pmsBaseAttrValue.getValueName());
                             iterator.remove();
                         }
                     }
                 }
+                pmsSeachCrumbs.add(pmsSeachCrumb);
             }
         }
+
+        map.put("attrValueSelectedList", pmsSeachCrumbs);
 
         String urlParam = getUrlParam(pmsSearchParam);
         map.put("urlParam", urlParam);
         String keyword = pmsSearchParam.getKeyword();
-        if (StringUtils.isNotBlank(keyword)){
-            map.put("keyword",keyword);
+        if (StringUtils.isNotBlank(keyword)) {
+            map.put("keyword", keyword);
         }
-        List<PmsSeachCrumb> pmsSeachCrumbs=new ArrayList<>();
         return "list";
     }
 
-    private String getUrlParam(PmsSearchParam pmsSearchParam) {
+    private String getUrlParam(PmsSearchParam pmsSearchParam, String... devValueId) {
         String keyword = pmsSearchParam.getKeyword();
         String catalog3Id = pmsSearchParam.getCatalog3Id();
         String[] valueId = pmsSearchParam.getValueId();
@@ -83,9 +90,15 @@ public class SearchCotroller {
         }
         if (valueId != null) {
             for (String pmsSkuAttrValue : valueId) {
-                urlParam += "&valueId=" + pmsSkuAttrValue;
+                for (String s : devValueId) {
+                    if (!pmsSkuAttrValue.equals(s)) {
+                        urlParam += "&valueId=" + pmsSkuAttrValue;
+                    }
+                }
+                if (devValueId.length == 0) {
+                    urlParam += "&valueId=" + pmsSkuAttrValue;
+                }
             }
-
         }
         return urlParam;
     }
