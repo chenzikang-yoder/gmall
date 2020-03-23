@@ -6,9 +6,12 @@ import com.atguigu.gmall.bean.PmsSkuInfo;
 import com.atguigu.gmall.service.SkuService;
 
 import io.searchbox.client.JestClient;
+import io.searchbox.core.Delete;
 import io.searchbox.core.Index;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
+import io.searchbox.indices.ClearCache;
+import io.searchbox.indices.DeleteIndex;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
@@ -37,13 +40,13 @@ public class GmallSearentServiceApplicationTests {
     @Test
     public void contextLoads() throws IOException {
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-        SearchSourceBuilder searchSourceBuilder=new SearchSourceBuilder();
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
 
-        TermsQueryBuilder termQueryBuilder=new TermsQueryBuilder("skuAttrValueList.valueId", new String[]{"39", "40", "41"});
+        TermsQueryBuilder termQueryBuilder = new TermsQueryBuilder("skuAttrValueList.valueId", new String[]{"39", "40", "41"});
         boolQueryBuilder.filter(termQueryBuilder);
 
-        MatchQueryBuilder matchQueryBuilder=new MatchQueryBuilder("skuName","华为");
+        MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("skuName", "华为");
         boolQueryBuilder.must(matchQueryBuilder);
 
         searchSourceBuilder.query(boolQueryBuilder);
@@ -51,7 +54,7 @@ public class GmallSearentServiceApplicationTests {
         searchSourceBuilder.from(0);
         searchSourceBuilder.size(20);
 
-        String dslStr=searchSourceBuilder.toString();
+        String dslStr = searchSourceBuilder.toString();
         System.out.println(dslStr);
         List<PmsSearchSkuInfo> pmsSearchSkuInfos = new ArrayList<>();
         Search search = new Search.Builder(dslStr).addIndex("gmall").addType("PmsSkuInfo").build();
@@ -75,7 +78,7 @@ public class GmallSearentServiceApplicationTests {
             pmsSearchSkuInfoList.add(pmsSearchSkuInfo);
         }
         for (PmsSearchSkuInfo pmsSearchSkuInfo : pmsSearchSkuInfoList) {
-            Index put = new Index.Builder(pmsSearchSkuInfo).index("gmall").type("PmsSkuInfo").id(pmsSearchSkuInfo.getId()+"").build();
+            Index put = new Index.Builder(pmsSearchSkuInfo).index("gmall").type("PmsSkuInfo").id(pmsSearchSkuInfo.getId() + "").build();
             jestClient.execute(put);
         }
     }

@@ -28,10 +28,9 @@ public class ItemController {
     SpuService spuService;
 
     @RequestMapping("{skuId}.html")
-    public String item(@PathVariable String skuId, ModelMap map, HttpServletRequest request) {
-        String remoteAddr = request.getRemoteAddr();
+    public String item(@PathVariable String skuId, ModelMap map) {
 
-        PmsSkuInfo pmsSkuInfo = skuService.getSkuById(skuId,remoteAddr);
+        PmsSkuInfo pmsSkuInfo = skuService.getSkuById(skuId);
         map.put("skuInfo", pmsSkuInfo);
 
         List<PmsProductSaleAttr> pmsProductSaleAttrs = spuService.spuSaleAttrListCheckBySku(pmsSkuInfo.getProductId(), pmsSkuInfo.getId());
