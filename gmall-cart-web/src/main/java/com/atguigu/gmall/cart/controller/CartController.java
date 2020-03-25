@@ -2,7 +2,7 @@ package com.atguigu.gmall.cart.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
-import com.atguigu.gmall.annotations.LosinRequired;
+import com.atguigu.gmall.annotations.LoginRequired;
 import com.atguigu.gmall.bean.OmsCartItem;
 import com.atguigu.gmall.bean.PmsSkuInfo;
 import com.atguigu.gmall.service.CartService;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,12 +30,17 @@ public class CartController {
     CartService cartService;
 
     @RequestMapping("toTrade")
-    @LosinRequired(loginSuccess = true)
-    public String toTrade(String isChecked, String skuId, ModelMap modelMap) {
+    @LoginRequired(loginSuccess = true)
+    public String toTrade(HttpServletRequest request, HttpServletResponse response, HttpSession session, ModelMap modelMap) {
+
+        String memberId = (String) request.getAttribute("memberId");
+        String nickname = (String) request.getAttribute("nickname");
+
         return "toTrade";
     }
 
     @RequestMapping("checkCart")
+    @LoginRequired(loginSuccess = false)
     public String checkCart(String isChecked, String skuId, ModelMap modelMap) {
 
         String memberId = "1";
@@ -55,6 +61,7 @@ public class CartController {
     }
 
     @RequestMapping("cartList")
+    @LoginRequired(loginSuccess = false)
     public String cartList(HttpServletRequest request, ModelMap modelMap) {
         List<OmsCartItem> omsCartItems = new ArrayList<>();
         String memberId = "1";
@@ -88,7 +95,7 @@ public class CartController {
     }
 
     @RequestMapping("addToCart")
-    @LosinRequired(loginSuccess = false)
+    @LoginRequired(loginSuccess = false)
     public String addToCart(String skuId, int quantity, HttpServletRequest request, HttpServletResponse response, ModelMap modelMap) {
         List<OmsCartItem> omsCartItems = new ArrayList<>();
 
