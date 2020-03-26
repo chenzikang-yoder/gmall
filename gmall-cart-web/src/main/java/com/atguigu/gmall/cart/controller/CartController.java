@@ -23,6 +23,7 @@ import java.util.List;
 
 @Controller
 public class CartController {
+
     @Reference
     SkuService skuService;
 
@@ -33,15 +34,16 @@ public class CartController {
     @LoginRequired(loginSuccess = true)
     public String toTrade(HttpServletRequest request, HttpServletResponse response, HttpSession session, ModelMap modelMap) {
 
-        String memberId = (String) request.getAttribute("memberId");
-        String nickname = (String) request.getAttribute("nickname");
+        String memberId = (String)request.getAttribute("memberId");
+        String nickname = (String)request.getAttribute("nickname");
 
         return "toTrade";
     }
 
+
     @RequestMapping("checkCart")
     @LoginRequired(loginSuccess = false)
-    public String checkCart(String isChecked, String skuId, ModelMap modelMap) {
+    public String checkCart(String isChecked,String skuId,HttpServletRequest request, HttpServletResponse response, HttpSession session, ModelMap modelMap) {
 
         String memberId = "1";
 
@@ -54,54 +56,65 @@ public class CartController {
 
         // 将最新的数据从缓存中查出，渲染给内嵌页
         List<OmsCartItem> omsCartItems = cartService.cartList(memberId);
-        modelMap.put("cartList", omsCartItems);
-        BigDecimal totalAmount = getTotalAmount(omsCartItems);
-        modelMap.put("totalAmount", totalAmount);
+        modelMap.put("cartList",omsCartItems);
+
+        // 被勾选商品的总额
+        BigDecimal totalAmount =getTotalAmount(omsCartItems);
+        modelMap.put("totalAmount",totalAmount);
         return "cartListInner";
     }
 
+
     @RequestMapping("cartList")
     @LoginRequired(loginSuccess = false)
-    public String cartList(HttpServletRequest request, ModelMap modelMap) {
+    public String cartList(HttpServletRequest request, HttpServletResponse response, HttpSession session, ModelMap modelMap) {
+
         List<OmsCartItem> omsCartItems = new ArrayList<>();
         String memberId = "1";
-        if (StringUtils.isNotBlank(memberId)) {
+
+        if(StringUtils.isNotBlank(memberId)){
+            // 已经登录查询db
             omsCartItems = cartService.cartList(memberId);
-            modelMap.put("memberId", memberId);
-        } else {
+        }else{
+            // 没有登录查询cookie
             String cartListCookie = CookieUtil.getCookieValue(request, "cartListCookie", true);
-            if (StringUtils.isNotBlank(cartListCookie)) {
-                omsCartItems = JSON.parseArray(cartListCookie, OmsCartItem.class);
+            if(StringUtils.isNotBlank(cartListCookie)){
+                omsCartItems = JSON.parseArray(cartListCookie,OmsCartItem.class);
             }
         }
+
         for (OmsCartItem omsCartItem : omsCartItems) {
             omsCartItem.setTotalPrice(omsCartItem.getPrice().multiply(omsCartItem.getQuantity()));
         }
-        modelMap.put("cartList", omsCartItems);
-        BigDecimal totalAmount = getTotalAmount(omsCartItems);
-        modelMap.put("totalAmount", totalAmount);
+
+        modelMap.put("cartList",omsCartItems);
+        // 被勾选商品的总额
+        BigDecimal totalAmount =getTotalAmount(omsCartItems);
+        modelMap.put("totalAmount",totalAmount);
         return "cartList";
     }
 
     private BigDecimal getTotalAmount(List<OmsCartItem> omsCartItems) {
         BigDecimal totalAmount = new BigDecimal("0");
+
         for (OmsCartItem omsCartItem : omsCartItems) {
-            if (omsCartItem.getIsChecked().equals("1")) {
-                BigDecimal totalPrice = omsCartItem.getTotalPrice();
+            BigDecimal totalPrice = omsCartItem.getTotalPrice();
+
+            if(omsCartItem.getIsChecked().equals("1")){
                 totalAmount = totalAmount.add(totalPrice);
             }
         }
+
         return totalAmount;
     }
 
     @RequestMapping("addToCart")
     @LoginRequired(loginSuccess = false)
-    public String addToCart(String skuId, int quantity, HttpServletRequest request, HttpServletResponse response, ModelMap modelMap) {
+    public String addToCart(String skuId, int quantity, HttpServletRequest request, HttpServletResponse response, HttpSession session) {
         List<OmsCartItem> omsCartItems = new ArrayList<>();
 
         // 调用商品服务查询商品信息
         PmsSkuInfo skuInfo = skuService.getSkuById(skuId);
-        modelMap.put("skuInfo", skuInfo);
 
         // 将商品信息封装成购物车信息
         OmsCartItem omsCartItem = new OmsCartItem();
@@ -119,8 +132,10 @@ public class CartController {
         omsCartItem.setProductSkuId(skuId);
         omsCartItem.setQuantity(new BigDecimal(quantity));
 
+
         // 判断用户是否登录
-        String memberId = "1";//"1";
+        String memberId = "1";//"1";request.getAttribute("memberId");
+
 
         if (StringUtils.isBlank(memberId)) {
             // 用户没有登录
@@ -153,16 +168,16 @@ public class CartController {
         } else {
             // 用户已经登录
             // 从db中查出购物车数据
-            OmsCartItem omsCartItemFromDb = cartService.ifCartExistByUser(memberId, skuId);
+            OmsCartItem omsCartItemFromDb = cartService.ifCartExistByUser(memberId,skuId);
 
-            if (omsCartItemFromDb == null) {
+            if(omsCartItemFromDb==null){
                 // 该用户没有添加过当前商品
                 omsCartItem.setMemberId(memberId);
                 omsCartItem.setMemberNickname("test小明");
                 omsCartItem.setQuantity(new BigDecimal(quantity));
                 cartService.addCart(omsCartItem);
 
-            } else {
+            }else{
                 // 该用户添加过当前商品
                 omsCartItemFromDb.setQuantity(omsCartItemFromDb.getQuantity().add(omsCartItem.getQuantity()));
                 cartService.updateCart(omsCartItemFromDb);
@@ -176,13 +191,17 @@ public class CartController {
         return "redirect:/success.html";
     }
 
-    private Boolean if_cart_exist(List<OmsCartItem> omsCartItems, OmsCartItem omsCartItem) {
+    private boolean if_cart_exist(List<OmsCartItem> omsCartItems, OmsCartItem omsCartItem) {
+
         for (OmsCartItem cartItem : omsCartItems) {
             String productSkuId = cartItem.getProductSkuId();
+
             if (productSkuId.equals(omsCartItem.getProductSkuId())) {
                 return true;
             }
         }
+
         return false;
     }
+
 }
