@@ -7,7 +7,6 @@ import com.atguigu.gmall.bean.UmsMember;
 import com.atguigu.gmall.service.UserService;
 import com.atguigu.gmall.util.JwtUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,16 +24,21 @@ public class PassportController {
     @RequestMapping("verify")
     @ResponseBody
     public String verify(String token, String currentIp) {
-        Map<String, String> map = new HashMap<>();
-        Map<String, Object> decode = JwtUtil.decode(token, "2019gmall110105", currentIp);
-        if (decode != null) {
-            map.put("status", "success");
-            map.put("memberId", (String) decode.get("memberId"));
-            map.put("nickname", (String) decode.get("nickname"));
-        } else {
-            map.put("status", "fail");
+        Map<String, String> modelMap = new HashMap<>();
+        Map<String, Object> decode = null;
+        try {
+            decode = JwtUtil.decode(token, "2019gmall110105", currentIp);
+        } catch (Exception e) {
+
         }
-        return JSON.toJSONString(map);
+        if (decode != null) {
+            modelMap.put("status", "success");
+            modelMap.put("memberId", (String) decode.get("memberId"));
+            modelMap.put("nickname", (String) decode.get("nickname"));
+        } else {
+            modelMap.put("status", "fail");
+        }
+        return JSON.toJSONString(modelMap);
     }
 
     @RequestMapping("login")

@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class HttpclientUtil {
 
-    public static String doGet(String url)   {
+    public static String doGet(String url) {
         // 创建Httpclient对象
         CloseableHttpClient httpclient = HttpClients.createDefault();
         // 创建http GET请求
@@ -36,29 +36,30 @@ public class HttpclientUtil {
                 return result;
             }
             httpclient.close();
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
-        return  null;
+        return null;
     }
 
 
-
-    public static String doPost(String url, Map<String,String> paramMap)   {
-       // 创建Httpclient对象
+    public static String doPost(String url, Map<String, String> paramMap) {
+        // 创建Httpclient对象
         CloseableHttpClient httpclient = HttpClients.createDefault();
         // 创建http Post请求
         HttpPost httpPost = new HttpPost(url);
         CloseableHttpResponse response = null;
         try {
-            List<BasicNameValuePair> list=new ArrayList<>();
+            List<BasicNameValuePair> list = new ArrayList<>();
             for (Map.Entry<String, String> entry : paramMap.entrySet()) {
-                list.add(new BasicNameValuePair(entry.getKey(),entry.getValue())) ;
+                list.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
             }
-            HttpEntity httpEntity=new UrlEncodedFormEntity(list,"utf-8");
+            HttpEntity httpEntity = new UrlEncodedFormEntity(list, "utf-8");
 
             httpPost.setEntity(httpEntity);
+
+
             // 执行请求
             response = httpclient.execute(httpPost);
 
@@ -71,11 +72,11 @@ public class HttpclientUtil {
                 return result;
             }
             httpclient.close();
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
 
-        return  null;
+        return null;
     }
 }
