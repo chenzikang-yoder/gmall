@@ -21,8 +21,6 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
         // 判断被拦截的请求的访问的方法的注解(是否时需要拦截的)
         HandlerMethod hm = (HandlerMethod) handler;
         LoginRequired methodAnnotation = hm.getMethodAnnotation(LoginRequired.class);
-        StringBuffer requestURL1 = request.getRequestURL();
-        System.out.println(requestURL1);
         // 是否拦截
         if (methodAnnotation == null) {
             return true;
