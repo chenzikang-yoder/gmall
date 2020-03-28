@@ -35,6 +35,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void addOutUser(UmsMember umsMember) {
+        userMapper.insertSelective(umsMember);
+    }
+
+    @Override
+    public UmsMember checkOauthUser(UmsMember umsCheck) {
+        UmsMember umsMember = userMapper.selectOne(umsCheck);
+        return umsMember;
+    }
+
+    @Override
     public List<UmsMemberReceiveAddress> getReceiveAddressByMemberId(String memberId) {
 
         // 封装的参数对象
@@ -75,8 +86,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addUserToken(String token, String memberId) {
-        Jedis jedis=redisUtil.getJedis();
-        jedis.setex("user:"+memberId+":token",60*60*2,token);
+        Jedis jedis = redisUtil.getJedis();
+        jedis.setex("user:" + memberId + ":token", 60 * 60 * 2, token);
         jedis.close();
     }
 

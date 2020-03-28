@@ -38,7 +38,8 @@ public class TestOauth2 {
     public static void main(String[] args) {
 
 //        getCode();
-        getuser_json(getaccess_token());
+        String getaccess_token = getaccess_token();
+        getuser_json(getaccess_token);
 
 
     }
