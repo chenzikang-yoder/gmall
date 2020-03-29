@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.bean.UmsMember;
 
 import com.atguigu.gmall.service.UserService;
+import com.atguigu.gmall.util.CookieUtil;
 import com.atguigu.gmall.util.HttpclientUtil;
 import com.atguigu.gmall.util.JwtUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +25,7 @@ public class PassportController {
     UserService userService;
 
     @RequestMapping("vlogin")
-    public String vlogin(String code, HttpServletRequest request) {
+    public String vlogin(String code, HttpServletRequest request, HttpServletResponse response) {
         String url = "https://api.weibo.com/oauth2/access_token?";
         Map<String, String> paramMap = new HashMap<>();
         paramMap.put("client_id", "1190749188");
@@ -57,6 +59,7 @@ public class PassportController {
         String memberId = umsMember.getId();
         String nickname = umsMember.getNickname();
         String token = Gettoken(memberId, nickname, request);
+        CookieUtil.setCookie(request, response, "oldToken", token, 60 * 60 * 2, true);
         return "redirect:http://search.gmall.com:8083/index?token="+token;
     }
 

@@ -22,7 +22,7 @@ public class TestOauth2 {
         paramMap.put("client_secret", "f633d34390e0d9103e13517f2f9aaf51");
         paramMap.put("grant_type", "authorization_code");
         paramMap.put("redirect_uri", "http://passport.gmall.com:8085/vlogin");
-        paramMap.put("code", "5997b0ba517efcf53f47575ecef08ecd");
+        paramMap.put("code", "32f9cb396f650c1c3c0602f3e09b94a7");
         String access_token = HttpclientUtil.doPost(s3, paramMap);
         Map<String, String> access_map = JSON.parseObject(access_token, Map.class);
         return access_map.get("access_token");
