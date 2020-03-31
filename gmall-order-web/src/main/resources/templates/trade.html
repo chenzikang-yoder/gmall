@@ -60,8 +60,11 @@
     <div class="top-3">
         <ul>
             <li class=".address default selected" th:each="userAddress:${userAddressList}">
-                <input name="deliveryAddress" type="radio" value="" th:checked="${userAddress.isDefault}=='1'">
-                <span th:text="${userAddress.consignee}">收件人AAAA </span><span th:text="${userAddress.userAddress}">具体地址111 </span>
+                <input name="deliveryAddress" type="radio"
+                       th:value="${userAddress.id}" th:checked="${userAddress.defaultStatus}=='1'"
+                       onclick="changeAddress()">
+                <span th:text="${userAddress.name}">收件人AAAA </span><span th:text="${userAddress.detailAddress}">具体地址111
+            </span>
             </li>
         </ul>
     </div>
@@ -93,7 +96,6 @@
                     <span style="float: right"> <span align="center" style="color: red">   </span> <span
                             th:text="'X '+${omsOrderItem.productName}"> X 1   </span> <span>有货</span>  <span>无货</span>  </span>
                 </div>
-
             </div>
         </div>
 
@@ -122,8 +124,8 @@
 </div>
 
 <form action="./submitOrder" method="post" id="orderForm">
-    <input name="consignee" id="consignee" type="hidden"/>
-    <input name="deliveryAddress" id="deliveryAddress" type="hidden"/>
+    <input name="receiveAddressId" id="receiveAddressId" value="1" type="hidden"/>
+    <input name="totalAmount" id="totalAmount" type="hidden" th:value="${totalAmount}"/>
     <input name="paymentWay" id="paymentWay" type="hidden"/>
     <input name="orderComment" id="orderComment" type="hidden"/>
     <span th:each="omsOrderItem,stat:${omsOrderItemList}">
@@ -139,8 +141,13 @@
     <input name="tradeCode" type="hidden" th:value="${tradeCode}"/>
 </form>
 <script>
+    function changeAddress(){
+        var receiveAddressId = $("input[name='deliveryAddress']:checked").val();
+        $("#receiveAddressId").val(receiveAddressId);
+    }
     $(function () {
-
+        var receiveAddressId = $("input[name='deliveryAddress']:checked").val();
+        $("#receiveAddressId").val(receiveAddressId);
         $("#submitButton").click(function () {
             $("#consignee").val($("input[type='radio']:checked").next().text());
             $("#deliveryAddress").val($("input[type='radio']:checked").next().next().text());

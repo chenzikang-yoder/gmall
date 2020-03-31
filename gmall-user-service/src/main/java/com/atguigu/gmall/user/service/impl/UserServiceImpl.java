@@ -12,6 +12,7 @@ import com.atguigu.gmall.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.Jedis;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 
@@ -54,9 +55,9 @@ public class UserServiceImpl implements UserService {
         List<UmsMemberReceiveAddress> umsMemberReceiveAddresses = umsMemberReceiveAddressMapper.select(umsMemberReceiveAddress);
 
 
-//       Example example = new Example(UmsMemberReceiveAddress.class);
-//       example.createCriteria().andEqualTo("memberId",memberId);
-//       List<UmsMemberReceiveAddress> umsMemberReceiveAddresses = umsMemberReceiveAddressMapper.selectByExample(example);
+/*       Example example = new Example(UmsMemberReceiveAddress.class);
+       example.createCriteria().andEqualTo("memberId",memberId);
+       List<UmsMemberReceiveAddress> umsMemberReceiveAddresses = umsMemberReceiveAddressMapper.selectByExample(example);*/
 
         return umsMemberReceiveAddresses;
     }
