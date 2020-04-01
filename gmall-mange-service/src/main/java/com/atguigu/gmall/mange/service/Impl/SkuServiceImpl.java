@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.Jedis;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -89,9 +90,10 @@ public class SkuServiceImpl implements SkuService {
                     jedis.setex(skuKey, 60 * 3, JSON.toJSONString(""));
                 }
                 String lockToken = jedis.get("sku:" + skuId + ":lock");
-                if (StringUtils.isNotBlank(lockToken) && lockToken.equals(token)) {
-                    jedis.del("sku:" + skuId + ":lock");
-                }
+                String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else " +
+                    "return 0 end";
+                Long eval = (Long) jedis.eval(script, Collections.singletonList("sku:" + skuId + ":lock"),
+                    Collections.singletonList(token));
             } else {
                 try {
                     Thread.sleep(3000);
@@ -136,5 +138,17 @@ public class SkuServiceImpl implements SkuService {
             pmsSkuInfo.setSkuAttrValueList(select);
         }
         return pmsSkuInfos;
+    }
+
+    @Override
+    public boolean checkPrice(String productSkuId, BigDecimal productPrice) {
+        PmsSkuInfo pmsSkuInfo = new PmsSkuInfo();
+        pmsSkuInfo.setId(productSkuId);
+        PmsSkuInfo pmsSkuInfo1 = pmsSkuInfoMapper.selectOne(pmsSkuInfo);
+        BigDecimal price = pmsSkuInfo1.getPrice();
+        if (price.compareTo(productPrice)==0){
+            return true;
+        }
+        return false;
     }
 }
