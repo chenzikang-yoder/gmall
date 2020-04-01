@@ -107,4 +107,13 @@ public class cartServiceImpl implements CartService {
 
     }
 
+    @Override
+    public void delCart(String productSkuId, String memberId) {
+        OmsCartItem omsCartItem=new OmsCartItem();
+        omsCartItem.setProductSkuId(productSkuId);
+        omsCartItem.setMemberId(memberId);
+        omsCartItemMapper.delete(omsCartItem);
+        flushCartCache(memberId);
+    }
+
 }
