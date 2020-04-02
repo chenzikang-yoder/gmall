@@ -31,8 +31,6 @@ public class CartController {
     CartService cartService;
 
 
-
-
     @RequestMapping("checkCart")
     @LoginRequired(loginSuccess = false)
     public String checkCart(String isChecked, String skuId, HttpServletRequest request, HttpServletResponse response, HttpSession session, ModelMap modelMap) {
@@ -67,34 +65,36 @@ public class CartController {
         String memberId = (String) request.getAttribute("memberId");
         String nickname = (String) request.getAttribute("nickname");
 
-        if (StringUtils.isNotBlank(memberId)) {
-            // 已经登录查询db
-            omsCartItems = cartService.cartList(memberId);
-            if (omsCartItems.size() == 0) {
+            if (StringUtils.isNotBlank(memberId)) {
+                // 已经登录查询db
+                omsCartItems = cartService.cartList(memberId);
+                if (omsCartItems != null) {
+                    String cartListCookie = CookieUtil.getCookieValue(request, "cartListCookie", true);
+                    if (StringUtils.isNotBlank(cartListCookie)) {
+                        omsCartItems = JSON.parseArray(cartListCookie, OmsCartItem.class);
+                        for (OmsCartItem omsCartItem : omsCartItems) {
+                            omsCartItem.setMemberNickname(nickname);
+                            omsCartItem.setMemberId(memberId);
+                            cartService.addCart(omsCartItem);
+                        }
+                    }
+                    CookieUtil.deleteCookie(request, response, "cartListCookie");
+                    cartService.flushCartCache(memberId);
+                }
+            } else {
+                // 没有登录查询cookie
                 String cartListCookie = CookieUtil.getCookieValue(request, "cartListCookie", true);
                 if (StringUtils.isNotBlank(cartListCookie)) {
                     omsCartItems = JSON.parseArray(cartListCookie, OmsCartItem.class);
-                    for (OmsCartItem omsCartItem : omsCartItems) {
-                        omsCartItem.setMemberNickname(nickname);
-                        omsCartItem.setMemberId(memberId);
-                        cartService.addCart(omsCartItem);
-                    }
                 }
-                CookieUtil.deleteCookie(request, response, "cartListCookie");
-                cartService.flushCartCache(memberId);
             }
-        } else {
-            // 没有登录查询cookie
-            String cartListCookie = CookieUtil.getCookieValue(request, "cartListCookie", true);
-            if (StringUtils.isNotBlank(cartListCookie)) {
-                omsCartItems = JSON.parseArray(cartListCookie, OmsCartItem.class);
-            }
-        }
-
         for (OmsCartItem omsCartItem : omsCartItems) {
             omsCartItem.setTotalPrice(omsCartItem.getPrice().multiply(omsCartItem.getQuantity()));
         }
-        modelMap.put("cartList", omsCartItems);
+        if (omsCartItems!=null){
+            modelMap.put("cartList", omsCartItems);
+        }
+
         // 被勾选商品的总额
         BigDecimal totalAmount = getTotalAmount(omsCartItems);
         modelMap.put("totalAmount", totalAmount);
