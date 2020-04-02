@@ -62,9 +62,10 @@ public class cartServiceImpl implements CartService {
             cartItem.setTotalPrice(cartItem.getPrice().multiply(cartItem.getQuantity()));
             map.put(cartItem.getProductSkuId(), JSON.toJSONString(cartItem));
         }
-
-        jedis.del("user:" + memberId + ":cart");
-        jedis.hmset("user:" + memberId + ":cart", map);
+        if (map.size() >0) {
+            jedis.del("user:" + memberId + ":cart");
+            jedis.hmset("user:" + memberId + ":cart", map);
+        }
 
         jedis.close();
     }
@@ -81,10 +82,10 @@ public class cartServiceImpl implements CartService {
                 omsCartItems.add(omsCartItem);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
        /*     String message = e.getMessage();
             logSeervice.addErrLog;*/
-       return null;
+            return null;
         } finally {
             jedis.close();
         }
@@ -98,9 +99,9 @@ public class cartServiceImpl implements CartService {
 
         Example e = new Example(OmsCartItem.class);
 
-        e.createCriteria().andEqualTo("memberId",omsCartItem.getMemberId()).andEqualTo("productSkuId",omsCartItem.getProductSkuId());
+        e.createCriteria().andEqualTo("memberId", omsCartItem.getMemberId()).andEqualTo("productSkuId", omsCartItem.getProductSkuId());
 
-        omsCartItemMapper.updateByExampleSelective(omsCartItem,e);
+        omsCartItemMapper.updateByExampleSelective(omsCartItem, e);
 
         // 缓存同步
         flushCartCache(omsCartItem.getMemberId());
@@ -109,7 +110,7 @@ public class cartServiceImpl implements CartService {
 
     @Override
     public void delCart(String productSkuId, String memberId) {
-        OmsCartItem omsCartItem=new OmsCartItem();
+        OmsCartItem omsCartItem = new OmsCartItem();
         omsCartItem.setProductSkuId(productSkuId);
         omsCartItem.setMemberId(memberId);
         omsCartItemMapper.delete(omsCartItem);

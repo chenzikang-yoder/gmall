@@ -88,8 +88,7 @@ public class SearchServiceImpl implements SearchService {
         searchSourceBuilder.sort("_score", SortOrder.DESC);
         searchSourceBuilder.from(0);
         searchSourceBuilder.size(20);
-
-        TermsBuilder groupby_attr = AggregationBuilders.terms("groupby_attr").field("skuAttrValueList.valueId");
+        TermsBuilder groupby_attr = AggregationBuilders.terms("groupby_attr").field("skuAttrValueList.valueId");groupby_attr= AggregationBuilders.terms("groupby_attr").field("skuAttrValueList.valueId");
         searchSourceBuilder.aggregation(groupby_attr);
         return searchSourceBuilder.toString();
     }
